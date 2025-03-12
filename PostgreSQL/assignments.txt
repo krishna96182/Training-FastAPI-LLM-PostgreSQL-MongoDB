@@ -1,0 +1,528 @@
+#CONDITIONAL STATEMENTS AND FUNCTIONS:
+
+
+1) return the movie names and whether they are international box office smashes, hits and flops.
+
+a) SELECT m.movie_name, mr.international_takings
+        CASE
+		WHEN internationall_takings >=300 THEN "smash"
+		WHEN internationall_takings >=100 THEN "hit"
+		WHEN internationall_takings >=0 THEN "flop"
+		ELSE "missing information"
+	END AS international_bos_office
+	FROM movie_revenues mr
+	JOIN movies m on mr.moviw_id = m.movie_id;
+
+
+
+2) return the continent that the director are based off on their nationality.
+
+a) SELECT first_name, last_name, nationality,
+	CASE 
+		WHEN nationality IN ('chinese', 'japanese') THEN 'ASIA'
+		WHEN nationality IN ('german', 'french') THEN 'Europe'
+		WHEN nationality IN ('America', 'Mexico') THEN 'America'
+		WHEN nationality IN ('Brazil') THEN 'South America'
+		WHEN nationality IN ('Australia') THEN 'Oceania'
+		ELSE 'no information'
+	END AS continent
+	FROM directors;
+
+
+
+
+#AGGREGATE FUNCTION:
+						      
+
+1) return the number of movies suitable for children (u, pg) and suitable for children (12, 15,18).
+
+a) query:
+
+SELECT 
+CASE
+	WHEN age_certificate IN ('U', 'PG') THEN 'suitable'
+	WHEN age_certificate IN ('12', '15', '18) THEN 'not suitable'
+END AS "is suitable?"
+COUNT(1) AS TOTAL
+FROM movies
+GROUP BY
+CASE
+	WHEN age_certificate IN ('U', 'PG') THEN 'suitable'
+	WHEN age_certificate IN ('12', '15', '18) THEN 'not suitable'
+END;
+
+
+
+2) For each age certificate: return average domestic takings for English language movies and international takings for non-English movies?
+
+
+a) query:
+
+SELECT m.age_certificate,
+	AVG(CASE WHEN m.movie_lang = 'English' THEN mv .domestic_takings
+		ELSE mv.international_takings END) AS takings
+FROM movies m
+JOIN movie_revenues mv ON m.movies_id = mv.movie_id
+GROUP BY m.age_certificate;
+
+
+
+#STRING FUNCTION:
+
+
+1) upper and lower:
+
+query:
+
+SELECT UPPER('hello') AS u_case;
+SELECT LOWER('HELLO') AS l_case;
+
+
+2) InitCap:
+
+query:
+
+SELECT INITCAP('hello world') as i_cap;
+
+output: Hello World
+
+
+3) left and right:
+
+query:
+
+SELECT LEFT('hello', 3) as temp;
+output: hel
+
+SELECT LEFT('hello', -3) as temp;
+output: he
+
+
+SELECT RIGHT('hello', 3) as temp;
+output: llo
+
+SELECT RIGHT('hello', -1) as temp;
+output: ello
+
+
+4) reverse:
+
+query:
+
+SELECT REVERSE('hello') AS temp;
+output: olleh
+
+5) substring:
+
+query:
+
+SELECT SUBSTRING('ELEPHANT', 3, 4) AS temp;
+output: epha
+
+
+
+6) replace: 
+
+query:
+
+SELECT REPLACE('cat plays with another cat', 'cat', 'dog');
+output: dog plays with another dog
+
+7) split part:
+
+query:
+
+SELECT SPLIT_PART('sample@gmail.com', '@', 2);
+output: gmail.com
+
+
+
+
+COALESCE FUNCTION:
+
+
+
+1) It takes unlimited arguments and returns first non-null value.
+
+
+query:
+
+SELECT COALESCE(5,1,2,7);
+output: 5
+
+SELECT COALESCE(null,null,3,5,null);
+output: 3
+
+SELECT COALESCE(null,null,null);
+output: null
+
+and then it replaces the null value into '0'.
+
+
+
+
+#NULL-IF FUNCTION:
+
+
+returns a null value if both the values are equal otherwise it returns the first argument.
+
+query:
+
+SELECT NULLIF('A', 'A');
+output: null
+
+SELECT NULLIF('A', 'B');
+output: A
+
+SELECT NULLIF('B', 'A');
+output: B
+
+SELECT NULLIF('A', 1); //both the argument must be convertable to one common  datatype 
+output: error
+
+
+SELECT NULLIF(1.0, 1);
+output: null //because it can be convertable to float.
+
+SELECT NULLIF(1.0, 2);
+output: 1.0 //because both are not equal
+
+
+
+
+
+
+1) return movie names, movie languages and age certificates. return null if the movie language is English or the age certificate is U.
+
+
+a) query:
+
+SELECT * FROM movies;
+
+
+SELECT movie_name, 
+	NULL_IF(movie_lang, 'English') AS movie_language,
+	NULL_IF(age_certificate, 'U') AS age_certificate
+FROM movies;
+
+
+
+
+2) return the column which contains the difference in values between the domestic takingds and the international takings for each movie
+
+
+
+a) query:
+
+SELECT * FROM movies_revenues;
+
+SELECT movie_id,
+	ABS((COALESCE(domestic_takings, 0) - COALESCE(international_takings, 0))) AS difference_dom_int;
+FROM movies_revenues;
+
+
+
+
+
+
+#GREATEST AND LEAST FUNCTION:
+
+
+
+return the greatest and least values from number of arguments.?
+
+query:
+
+SELECT GREATEST(1,2,NULL,3);
+output: 3
+
+
+SELECT LEAST(1,2,NULL,3);
+output: 1
+
+
+
+SELECT GREATEST('A','a','B','b','C','c');
+output: c
+
+
+
+SELECT LEAST('A','a','B','b','C','c');
+output: A
+
+
+
+#AGGREGATE FUNCTION:
+
+
+query:
+
+SELECT movie_lang, avg(movie_length)
+FROM movies 
+GROUP BY movie_lang;
+
+
+
+#WINDOWS FUNCTION:
+
+
+query:
+
+SELECT movie_lang, avg(movie_length)
+OVER(PARTITION BY movie_lang)
+FROM movies;
+
+
+
+query:
+
+SELECT movie_name, movie_lang, movie_length, age_certificate, AVG(movie_length) 
+OVER( PARTITION BY age_certificate ORDER BY movie_name)
+FROM movies
+WHERE movie_length >= 110;
+
+
+#Multiple window function:
+
+query:
+
+SELECT movie_name, movie_lang, movie_length, 
+MIN(movie_length) OVER(PARTITION BY movie_lang)
+MAX(movie_length) OVER(PARTITION BY movie_lang)
+FROM movies; 
+
+
+example:
+
+query:
+
+SELECT movie_name, movie_lang, movie_length,
+MIN(movie_length) OVER(PARTITION BY movie_lang ORDER BY movie_name),
+MAX(movie_length) OVER(PARTITION BY movie_lang ORDER BY movie_name)
+FROM movies;
+
+
+
+1. Return the running total domestic takings for each movie age certificate ordered by release date for English language movies only.
+
+query:
+
+SELECT m.movie_name, m.movie_lang, mr.domestic_takings, SUM(mr.domestic_takings) OVER (PARTITION BY m.age_certificate ORDER BY m.release_date)
+FROM movies m JOIN movie_revenues mr ON m.movie_id=mr.movie_id
+WHERE m.movie_lang='English';
+
+
+2. Find the moving/running minimum, maximum and average movie lengths for each directly nationality ordered by movie_name.
+
+query:
+
+SELECT m.movie_name, d.first_name, d.nationality, m.length, MIN(m.movie_length) OVER (PARTITION BY d.nationality ORDER BY m.movie_name)
+MAX(m.movie_length) OVER (PAARTITION BY d.nationality ORDER BY m.movie_name)
+FROM movies m 
+INNER JOIN director d ON d.director_id=m.director_id
+
+
+#ROWNUMBER:
+
+
+1. Assigns a unique integer value to each row in a window starting from 1.
+2. Can be used to return a virtual ID for each row.
+
+Example:
+
+query:
+
+SELECT first_name, date_of_birth,nationality, ROW_NUMBER() OVER (PARTITION BY nationality) 
+FROM directors;
+
+
+query:
+
+SELECT * FROM
+(SELECT first_name, date_of_birth, nationality, ROW_NUMBER() OVER (PARTIOTION BY nationality)
+FROM directors)
+AS t
+WHERE row_number = 1;
+
+
+#RANK FUNCTION:
+
+1.Assigns a ranking value to the ordered partition. If rows have the same value, then they will be assigned the same rank by skipping the next rank value.
+
+query:
+
+SELECT movie_name, movie_lang, movie_length, RANK()
+OVER (ORDER BY movie_length)
+FROM movies;
+
+
+
+#DENSE RANK:
+
+1. Assigns the ranking value to the ordered partition. If the rows have the same value then they will be assigned same rank and the next rank value is not skipped.
+
+query:
+
+SELECT movie_name, movie_lang, movie_length,
+DENSE_RANK() OVER (PARTITION BY movie_lang ORDER BY movie_length)
+FROM movies;
+
+
+
+#FIRST VALUE:
+
+1. Return the first value in a sorted partition.
+
+query:
+
+SELECT movie_name, movie_length, age_certificate,
+FIRST_VALUE(movie_name)
+OVER (ORDER BY movie_length) AS short_movie
+FROM movies;
+
+
+query:
+
+SELECT movie_name, movie_length, age_certificate,
+FIRST_VALUE(movie_name)
+OVER (PARTITION BY age_certificate ORDER BY movie_length) 
+AS short_movie
+FROM movies;
+
+
+
+#LAST VALUE:
+
+1. Return the last value in a assorted partition.
+
+query:
+
+SELECT movie_name, movie_lang, movie_length,
+LAST_VALUE(movie_name)
+OVER (PARTITION BY age_certificate ORDER BY movie_length)
+AS long_movie
+FROM movies;
+
+
+
+1. Return the 3 longest movies for each movie language (USE ROW_NUMBER).
+
+query:
+
+SELECT * FROM 
+(SELECT ovie_name, movie_length, movie_lang,
+ROW_NUMBER() OVER (PARTITION BY movie_Lang
+ORDER BY movie_length DESC)
+FROM movies) AS m
+WHERE row_number <= 3
+
+
+2. Return the ranking of movies based off their domestic takings per movie language
+
+query:
+
+SELECT m.movie_name, m,movie_lang, mr.domestic_takings,
+RANK() OVER (PARTITION BY movie_lang ORDER BY mr.domestic_takings DESC)
+FROM movies m
+JOIN movies_revenues mr ON m.movie_id=mr.movie_id
+WHERE mr.domestic_takings IS NOT NULL;
+
+
+
+#LAG FUNCTION:
+
+1. Access previous row data from the current row. Useful for comparing the current row to previous rows.
+
+query:
+
+SELECT * FROM movies;
+
+SELECT movie_name, movie_lang, movie_length,
+LAG(release_date,1) OVER (ORDER BY movie_length)
+As previous_release_date
+FROM movies;
+
+
+
+
+#LEAD FUNCTION:
+
+
+1. Access the next row data from the current row. Useful for comparing current row with the next row data.
+
+query:
+
+SELECT movie_name, movie_lang, release_date, 
+LEAD(release_date, 1)
+OVER(ORDER BY movie_length) AS next_release
+FROM movies;
+
+
+
+
+#NTH VALUE:
+
+1. It will return the nth values in an ordered partition.
+
+query:
+
+SLECT movie_name, movie_length, movie_lang,
+NTH_VALUE(movie_name, 2)
+OVER (ORDER BY movie_length)
+FROM movies;
+
+
+1. Return movies, ordered by release date, comparing the international taking to the previous row value. Ignore the NULL values and use a default value of zero.
+
+query:
+
+SELECT m.movie_name, m.release_date, mr.international_takings,
+LAG(mr.international_takings,1,0.0)
+OVER (ORDER BY m.release_date)
+FROM movies m
+JOIN movies_revenue mr ON m.movie_id=mr.movie_id
+WHERE mr.international_takings IS NOT NULL;
+
+
+2. Return the second movie name in each age certification window/ partition ordered by domestic takings ignoring the NULL values.
+
+query:
+
+SELECT m.movie_name, m.age_certificate,
+NTH_VALUE(m.movie_name,2)
+OVER (PARTITION BY m.age_certificate ORDER BY 
+mr.domestic_rakings ASC RANGE BETWEEN UNBOUNDED PRECEEDING AND UNBOUNDED FOLLOWING)
+FROM movies m
+JOIN movies_revenue mr ON m.movie_id=mr.movie_id
+WHERE mr.domestic_takings IS NOT NULL;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
