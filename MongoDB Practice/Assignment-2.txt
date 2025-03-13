@@ -1,0 +1,90 @@
+#Assignment-2
+
+#Question-1
+
+hospitalhistory> use company
+switched to db company
+company> db.companies.insertOne({name: "google", stock: 150, _id:1})
+{ acknowledged: true, insertedId: 1 }
+company> db.companies.insertMany([
+...     {name: "microsoft", stock: 100, _id:2},
+...     {name: "ascendion", stock:500, _id:3}
+... ])
+{ acknowledged: true, insertedIds: { '0': 2, '1': 3 } }
+company> db.companies.find().pretty()
+[
+  { _id: 1, name: 'google', stock: 150 },
+  { _id: 2, name: 'microsoft', stock: 100 },
+  { _id: 3, name: 'ascendion', stock: 500 }
+]
+
+#Question-2
+
+company> db.companies.insertMany(
+...     [
+...             {name: "google", stock: 88, _id:1},
+...             {name: "tcs", stock:12 , _id:4}
+...     ],
+...     {ordered: false}
+...
+... )
+Uncaught:
+MongoBulkWriteError: E11000 duplicate key error collection: company.companies index: _id_ dup key: { _id: 1 }
+Result: BulkWriteResult {
+  insertedCount: 1,
+  matchedCount: 0,
+  modifiedCount: 0,
+  deletedCount: 0,
+  upsertedCount: 0,
+  upsertedIds: {},
+  insertedIds: { '1': 4 }
+}
+Write Errors: [
+  WriteError {
+    err: {
+      index: 0,
+      code: 11000,
+      errmsg: 'E11000 duplicate key error collection: company.companies index: _id_ dup key: { _id: 1 }',
+      errInfo: undefined,
+      op: { name: 'google', stock: 88, _id: 1 }
+    }
+  }
+]
+company> db.companies.find().pretty()
+[
+  { _id: 1, name: 'google', stock: 150 },
+  { _id: 2, name: 'microsoft', stock: 100 },
+  { _id: 3, name: 'ascendion', stock: 500 },
+  { _id: 4, name: 'tcs', stock: 12 }
+]
+
+#Question-3
+
+company> db.companies.insertOne(
+...     {name: "apple", stock: 205, _id:5},
+...     {writeConcern: {w: 1, j: false}})
+{ acknowledged: true, insertedId: 5 }
+company> db.companies.find().pretty()
+[
+  { _id: 1, name: 'google', stock: 150 },
+  { _id: 2, name: 'microsoft', stock: 100 },
+  { _id: 3, name: 'ascendion', stock: 500 },
+  { _id: 4, name: 'tcs', stock: 12 },
+  { _id: 5, name: 'apple', stock: 205 }
+]
+company> db.companies.insertOne(
+...     {name: "touchy tables inc", stock: 212, _id:6},
+...     {writeConcern: {w: 1, j: true}}
+... )
+{ acknowledged: true, insertedId: 6 }
+company>
+
+company> db.companies.find().pretty()
+[
+  { _id: 1, name: 'google', stock: 150 },
+  { _id: 2, name: 'microsoft', stock: 100 },
+  { _id: 3, name: 'ascendion', stock: 500 },
+  { _id: 4, name: 'tcs', stock: 12 },
+  { _id: 5, name: 'apple', stock: 205 },
+  { _id: 6, name: 'touchy tables inc', stock: 212 }
+]

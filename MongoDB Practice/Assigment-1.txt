@@ -1,0 +1,156 @@
+#Assignment-1
+
+#Question-1
+
+test> use hospitalhistory
+switched to db hospitalhistory
+hospitalhistory> db.patients.insertMany([
+...   {
+...     "firstName": "krishna",
+...     "lastName": "vamsi",
+...     "age": 22,
+...     "history": [
+...       { "disease": "cold", "treatment": "tablets" },
+...       { "disease": "fever", "treatment": "syrup" }
+...     ]
+...   },
+...   {
+...     "firstName": "Satya Narayana",
+...     "lastName": "Gangisetty",
+...     "age": 50,
+...     "history": [
+...       { "disease": "headache", "treatment": "dart" }
+...     ]
+...   },
+...   {
+...     "firstName": "Dhana Lakshmi",
+...     "lastName": "Muppuri",
+...     "age": 45,
+...     "history": [
+...       { "disease": "body pain", "treatment": "tablets" }
+...     ]
+...   }
+... ]);
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId('67d2c1f94b9e68babbc4e49b'),
+    '1': ObjectId('67d2c1f94b9e68babbc4e49c'),
+    '2': ObjectId('67d2c1f94b9e68babbc4e49d')
+  }
+}
+hospitalhistory> db.patients.find().pretty()
+[
+  {
+    _id: ObjectId('67d2c1f94b9e68babbc4e49b'),
+    firstName: 'krishna',
+    lastName: 'vamsi',
+    age: 22,
+    history: [
+      { disease: 'cold', treatment: 'tablets' },
+      { disease: 'fever', treatment: 'syrup' }
+    ]
+  },
+  {
+    _id: ObjectId('67d2c1f94b9e68babbc4e49c'),
+    firstName: 'Satya Narayana',
+    lastName: 'Gangisetty',
+    age: 50,
+    history: [ { disease: 'headache', treatment: 'dart' } ]
+  },
+  {
+    _id: ObjectId('67d2c1f94b9e68babbc4e49d'),
+    firstName: 'Dhana Lakshmi',
+    lastName: 'Muppuri',
+    age: 45,
+    history: [ { disease: 'body pain', treatment: 'tablets' } ]
+  }
+]
+
+#Question 2
+
+hospitalhistory> db.patients.updateOne(
+...     {
+...     "firstName": "krishna",
+...     "history.disease": "cold"
+...     },
+...     {
+...     $set : { "age": 23 , "lastName" : "Gangisetty", "history.$.treatment": "cheston cold"}
+...     }
+... )
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+hospitalhistory> db.patients.find().pretty()
+[
+  {
+    _id: ObjectId('67d2c1f94b9e68babbc4e49b'),
+    firstName: 'krishna',
+    lastName: 'Gangisetty',
+    age: 23,
+    history: [
+      { disease: 'cold', treatment: 'cheston cold' },
+      { disease: 'fever', treatment: 'syrup' }
+    ]
+  },
+  {
+    _id: ObjectId('67d2c1f94b9e68babbc4e49c'),
+    firstName: 'Satya Narayana',
+    lastName: 'Gangisetty',
+    age: 50,
+    history: [ { disease: 'headache', treatment: 'dart' } ]
+  },
+  {
+    _id: ObjectId('67d2c1f94b9e68babbc4e49d'),
+    firstName: 'Dhana Lakshmi',
+    lastName: 'Muppuri',
+    age: 45,
+    history: [ { disease: 'body pain', treatment: 'tablets' } ]
+  }
+]
+
+#Question-3
+
+hospitalhistory> db.patients.find({age : {$gt: 30}})
+[
+  {
+    _id: ObjectId('67d2c1f94b9e68babbc4e49c'),
+    firstName: 'Satya Narayana',
+    lastName: 'Gangisetty',
+    age: 50,
+    history: [ { disease: 'headache', treatment: 'dart' } ]
+  },
+  {
+    _id: ObjectId('67d2c1f94b9e68babbc4e49d'),
+    firstName: 'Dhana Lakshmi',
+    lastName: 'Muppuri',
+    age: 45,
+    history: [ { disease: 'body pain', treatment: 'tablets' } ]
+  }
+]
+
+#Question-4
+
+hospitalhistory> db.patients.deleteMany({"history.disease": "cold"})
+{ acknowledged: true, deletedCount: 1 }
+hospitalhistory> db.patients.find().pretty()
+[
+  {
+    _id: ObjectId('67d2c1f94b9e68babbc4e49c'),
+    firstName: 'Satya Narayana',
+    lastName: 'Gangisetty',
+    age: 50,
+    history: [ { disease: 'headache', treatment: 'dart' } ]
+  },
+  {
+    _id: ObjectId('67d2c1f94b9e68babbc4e49d'),
+    firstName: 'Dhana Lakshmi',
+    lastName: 'Muppuri',
+    age: 45,
+    history: [ { disease: 'body pain', treatment: 'tablets' } ]
+  }
+]

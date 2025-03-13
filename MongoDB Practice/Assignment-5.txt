@@ -1,0 +1,93 @@
+#Assignment-5
+
+#Question-1
+
+boxOffice> use games
+switched to db games
+games> db.sports.updateMany({}, {$set: {title: "Running", requiresTeam: false}}, {upsert: true})
+{
+  acknowledged: true,
+  insertedId: ObjectId('67d2d4912c4a7ee4aad9220d'),
+  matchedCount: 0,
+  modifiedCount: 0,
+  upsertedCount: 1
+}
+games> db.sports.find().pretty()
+[
+  {
+    _id: ObjectId('67d2d4912c4a7ee4aad9220d'),
+    requiresTeam: false,
+    title: 'Running'
+  }
+]
+games> db.sports.updateMany({title: "Soccer"}, {$set: {requiresTeam: true}}, {upsert: true})
+{
+  acknowledged: true,
+  insertedId: ObjectId('67d2d4f72c4a7ee4aad92225'),
+  matchedCount: 0,
+  modifiedCount: 0,
+  upsertedCount: 1
+}
+games> db.sports.find().pretty()
+[
+  {
+    _id: ObjectId('67d2d4912c4a7ee4aad9220d'),
+    requiresTeam: false,
+    title: 'Running'
+  },
+  {
+    _id: ObjectId('67d2d4f72c4a7ee4aad92225'),
+    title: 'Soccer',
+    requiresTeam: true
+  }
+]
+
+#Question-2
+
+games> db.sports.updateMany({requiresTeam: true},{$set: {minPlayers: 11}})
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+games> db.sports.find().pretty()
+[
+  {
+    _id: ObjectId('67d2d4912c4a7ee4aad9220d'),
+    requiresTeam: false,
+    title: 'Running'
+  },
+  {
+    _id: ObjectId('67d2d4f72c4a7ee4aad92225'),
+    title: 'Soccer',
+    requiresTeam: true,
+    minPlayers: 11
+  }
+]
+
+#Question-3
+
+games> db.sports.updateMany({requiresTeam: true},{$inc: {minPlayers: 10}})
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+games> db.sports.find().pretty()
+[
+  {
+    _id: ObjectId('67d2d4912c4a7ee4aad9220d'),
+    requiresTeam: false,
+    title: 'Running'
+  },
+  {
+    _id: ObjectId('67d2d4f72c4a7ee4aad92225'),
+    title: 'Soccer',
+    requiresTeam: true,
+    minPlayers: 21
+  }
+]
